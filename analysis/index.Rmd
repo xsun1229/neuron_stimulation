@@ -1,5 +1,5 @@
 ---
-title: "Home"
+title: "Neuron Stimulation Analysis"
 site: workflowr::wflow_site
 output:
   workflowr::wflow_html:
@@ -8,4 +8,5 @@ editor_options:
   chunk_output_type: console
 ---
 
-Welcome to my research website.
+
+[Enrichment analysis for candidate genes](https://xsun1229.github.io/neuron_stimulation/enrichment.html)

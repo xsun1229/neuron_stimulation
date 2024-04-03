@@ -1,0 +1,100 @@
+---
+title: "Enrichment analysis for candidate genes"
+author: "XSun"
+date: "2024-04-03"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
+---
+
+# Introduction
+
+Based on the candidate genes from cTWAS && neuron-stimulation eQTL data. We did enrichment analyses to see if the candidate genes are enriched in SCZ-related gene lists or SCZ-related benchmark genes.
+
+The overall enrichment analysis pipeline is: 
+
+1. Selecting the candidate genes: we filtered the genes using PIP > 0.5 && in credible sets. The number of candidate genes is 67.
+
+2. Baseline genes: all genes analyzed in ctwas but not candidate genes are considered as baseline genes. 
+
+3. Computing the overlap for candidate genes & gene sets and baseline genes & gene sets. 
+
+4. Fisher tests
+
+```{r}
+fisher_matrix <- matrix(c("n1","n2","n3","n4"),nrow = 2,ncol = 2)
+rownames(fisher_matrix) <- c("#included in gene sets","#notincluded in gene sets")
+colnames(fisher_matrix) <- c("candidate genes","baseline genes")
+
+print(fisher_matrix)
+```
+
+
+# If the gene sets are enriched with known SCZ-related gene lists. 
+
+The SCZ-related gene lists were from PGC3: Table S7 https://www.nature.com/articles/s41586-022-04434-5 
+
+We also added two gene lists: Intellectual disability (ID) and SFARI genes in catergory 1 and 2. 
+
+```{r}
+load("/project2/xinhe/xsun/neuron_stimulation/4.ctwas_analysis_allcontext/results/enrichment_pip0.5.rdata")
+DT::datatable(summary,
+             caption = htmltools::tags$caption(style = 'caption-side: left; text-align: left; color:black; font-size:150%;',
+                                                  'Fisher exact test p values for all gene sets'),
+             options = list(pageLength = 6))
+```
+
+
+# MAGMA + machine learning predictions - score the cTWAS genes.
+
+The details for this method are here
+https://sq-96.github.io/multigroup_ctwas_analysis/multi_tissue_ldmerge_validation.html#Overview
+
+In logistic models, the genes with magma fdr < 0.05 were treated as 1, others were treated as 0
+
+'_trunc500' or '_trunc1000' meanings: if the number of genes with magma fdr < 0.05 is greater than 500/1000, top 500/1000 genes were treated as 1, others were treated as 0. 
+
+```{r}
+load("/project2/xinhe/xsun/neuron_stimulation/4.ctwas_analysis_allcontext/results/enrich_training_sum.rdata")
+DT::datatable(sum,
+             caption = htmltools::tags$caption(style = 'caption-side: left; text-align: left; color:black; font-size:150%;',
+                                                  'Fisher exact test p values for all gene sets'),
+             options = list(pageLength = 6))
+```
+
+```{r}
+load("/project2/xinhe/xsun/neuron_stimulation/4.ctwas_analysis_allcontext/results/enrich_training_sum.rdata")
+DT::datatable(sum,
+             caption = htmltools::tags$caption(style = 'caption-side: left; text-align: left; color:black; font-size:150%;',
+                                                  'Fisher exact test p values for all gene sets'),
+             options = list(pageLength = 6))
+```
+
+
+# Gene labels
+
+The tables below contains the annotation and gene scores from the prediction models for all candidate genes. 
+
+```{r}
+load("/project2/xinhe/xsun/neuron_stimulation/4.ctwas_analysis_allcontext/results/label_annot_candi_genes.rdata")
+rownames(gene_annotation_df) <- seq(1,nrow(gene_annotation_df))
+DT::datatable(gene_annotation_df,
+             caption = htmltools::tags$caption(style = 'caption-side: left; text-align: left; color:black; font-size:150%;',
+                                                  'Gene annotations'),
+             options = list(pageLength = 5))
+
+DT::datatable(gene_label,
+             caption = htmltools::tags$caption(style = 'caption-side: left; text-align: left; color:black; font-size:150%;',
+                                                  'Gene labels from the prediction models'),
+             options = list(pageLength = 5))
+
+```
+
+
+
+
+
+
+
+
