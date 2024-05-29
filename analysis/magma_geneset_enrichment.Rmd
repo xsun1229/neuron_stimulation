@@ -12,7 +12,7 @@ output:
 
 ## Gene set overview
 
-We used MAGMA to do the gene set enrichment analysis for 15 gene sets below. 
+We used MAGMA to do the gene set enrichment analysis for 15 gene sets below. Since MAGMA works on ENTREZ ID, we converted the gene symbols into ENTREZID using `EnsDb.Hsapiens.v75`
 
 ```{r  message=FALSE}
 library(ggplot2)
@@ -25,7 +25,6 @@ DT::datatable(all_set,caption = htmltools::tags$caption( style = 'caption-side: 
 
 ```
 
-Since MAGMA works on ENTREZ ID, we converted the gene symbols into ENTREZID using `EnsDb.Hsapiens.v75`
 
 ```{r message=FALSE}
 # Count the number of genes in each cluster
