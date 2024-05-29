@@ -19,8 +19,10 @@ library(ggplot2)
 library(tidyr)
 library(reshape2)
 
-gene_sets <- read.table("/project2/xinhe/xsun/neuron_stimulation/5.magma/data/geneset.raw.txt",header = T, sep = ",")
-head(gene_sets)
+
+load("/project2/xinhe/xsun/neuron_stimulation/5.magma/data/all_set_annotated.rdata")
+DT::datatable(all_set,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Annotated gene sets'),options = list(pageLength = 5) )
+
 ```
 
 Since MAGMA works on ENTREZ ID, we converted the gene symbols into ENTREZID using `EnsDb.Hsapiens.v75`
