@@ -1,0 +1,92 @@
+---
+title: "Gene set enrichment analysis -- MAGMA"
+author: "XSun"
+date: "2024-05-29"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
+---
+
+# Introduction
+
+## Gene set overview
+
+We used MAGMA to do the gene set enrichment analysis for 15 gene sets below. 
+
+```{r  message=FALSE}
+library(ggplot2)
+library(tidyr)
+library(reshape2)
+
+gene_sets <- read.table("/project2/xinhe/xsun/neuron_stimulation/5.magma/data/geneset.raw.txt",header = T, sep = ",")
+head(gene_sets)
+```
+
+Since MAGMA works on ENTREZ ID, we converted the gene symbols into ENTREZID using `EnsDb.Hsapiens.v75`
+
+```{r message=FALSE}
+# Count the number of genes in each cluster
+
+load("/project2/xinhe/xsun/neuron_stimulation/5.magma/data/geneset_gene_count.rdata")
+
+DT::datatable(gene_counts,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','The number of genes in each cluster'),options = list(pageLength = 5) )
+
+gene_counts_long <- gene_counts %>%
+  pivot_longer(cols = c(count_GENESYMBOL, count_ENTREZID), names_to = "Type", values_to = "Count")
+
+# Plot the barplot
+ggplot(gene_counts_long, aes(x = as.factor(Cluster), y = Count, fill = Type)) +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  labs(x = "Cluster", y = "Count", fill = "Type", title = "Gene Counts by Cluster") +
+  theme_minimal()
+```
+
+## MAGMA settings
+
+We ran MAGMA following https://cloufield.github.io/GWASTutorial/09_Gene_based_analysis/#download-reference-files 
+
+- Annotate SNPs
+
+To capture the variants in the regulatory regions, we set a 50 kb upstream and 50kb downstream window for each gene.
+
+- Gene-based analysis
+
+GWAS are required in this step. The traits included are: 
+
+```{r message=FALSE}
+# Count the number of genes in each cluster
+
+gwas <- read.table("/project2/xinhe/xsun/neuron_stimulation/5.magma/data/gwas_source_update.txt",header = T)
+
+DT::datatable(gwas,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','GWAS included'),options = list(pageLength = 5) )
+
+```
+
+**MD stands for Major depression, BP is bipolar, PK is Parkinson, NS is Neuroticism score**
+
+- Gene-set level analysis
+
+The gene-set file is `/project2/xinhe/xsun/neuron_stimulation/5.magma/data/genesets_entrezid.txt`.
+
+# Results
+
+```{r message=FALSE}
+# Count the number of genes in each cluster
+
+load("/project2/xinhe/xsun/neuron_stimulation/5.magma/geneset_p.rdata")
+
+DT::datatable(p_set,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Gene-set analysis p-values from MAGMA'),options = list(pageLength = 5) )
+
+pvalues_long <- melt(p_set, varnames = c("Set", "Condition"), value.name = "PValue")
+
+# Plot the heatmap with conditional coloring
+ggplot(pvalues_long, aes(x = Condition, y = Set, fill = PValue < 0.05)) +
+  geom_tile(color = "white") +
+  scale_fill_manual(values = c("TRUE" = "red", "FALSE" = "blue"), labels = c("P-value > 0.05", "P-value < 0.05")) +
+  labs(title = "Heatmap of P-values", x = "Traits", y = "Gene Sets", fill = "p from MAGMA geneset analysis") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+

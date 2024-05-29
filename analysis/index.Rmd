@@ -10,3 +10,5 @@ editor_options:
 
 
 [Enrichment analysis for candidate genes](https://xsun1229.github.io/neuron_stimulation/enrichment.html)
+
+[Gene set enrichment analysis -- MAGMA](https://xsun1229.github.io/neuron_stimulation/magma_geneset_enrichment.html)
