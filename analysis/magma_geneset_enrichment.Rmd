@@ -101,17 +101,28 @@ The q-value is computed by `qvalue(p_values)` from `qvalue` package
 
 load("/project2/xinhe/xsun/neuron_stimulation/5.magma/results/q_values_matrix.rdata")
 
-DT::datatable(q_values_matrix,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Gene-set analysis p-values from MAGMA'),options = list(pageLength = 5) )
+DT::datatable(q_values_matrix,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Gene-set analysis q-values from MAGMA'),options = list(pageLength = 5) )
 
 qvals_long <- melt(q_values_matrix, varnames = c("Set", "Condition"), value.name = "qval")
 
-# Plot the heatmap with conditional coloring
-ggplot(qvals_long, aes(x = Condition, y = Set, fill = qval < 0.3)) +
+ggplot(qvals_long, aes(x = Condition, y = Set, fill = qval)) +
   geom_tile(color = "white") +
-  scale_fill_manual(values = c("TRUE" = "red", "FALSE" = "blue"), labels = c("q-values > 0.3", "q-values < 0.3")) +
-  labs(title = "Heatmap of q-values", x = "Traits", y = "Gene Sets", fill = "q-values from MAGMA geneset analysis") +
+  scale_fill_gradient2(low = "red", high = "blue", mid = "white", midpoint = 0.5,
+                       limit = c(0, 1),        # Adjust if your q-values range is different
+                       breaks = seq(0, 1, 0.1), # Adjust breaks according to your q-values range
+                       labels = seq(0, 1, 0.1)) + # Label adjustments
+  labs(title = "Heatmap of q-values", x = "Traits", y = "Gene Sets", fill = "Q-values") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+# Plot the heatmap with conditional coloring
+# ggplot(qvals_long, aes(x = Condition, y = Set, fill = qval < 0.3)) +
+#   geom_tile(color = "white") +
+#   scale_fill_manual(values = c("TRUE" = "red", "FALSE" = "blue"), labels = c("q-values > 0.3", "q-values < 0.3")) +
+#   labs(title = "Heatmap of q-values", x = "Traits", y = "Gene Sets", fill = "q-values from MAGMA geneset analysis") +
+#   theme_minimal() +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
 
