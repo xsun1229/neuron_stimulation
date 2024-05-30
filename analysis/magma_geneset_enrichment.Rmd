@@ -75,7 +75,7 @@ The gene-set file is `/project2/xinhe/xsun/neuron_stimulation/5.magma/data/genes
 ```{r message=FALSE}
 # Count the number of genes in each cluster
 
-load("/project2/xinhe/xsun/neuron_stimulation/5.magma/geneset_p.rdata")
+load("/project2/xinhe/xsun/neuron_stimulation/5.magma/results/geneset_p.rdata")
 
 DT::datatable(p_set,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Gene-set analysis p-values from MAGMA'),options = list(pageLength = 5) )
 
@@ -90,4 +90,48 @@ ggplot(pvalues_long, aes(x = Condition, y = Set, fill = PValue < 0.05)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
+
+
+Then do a multiple testing correction for all the tests (15 gene sets x 7 traits) using q-values. 
+
+The q-value is computed by `qvalue(p_values)` from `qvalue` package
+
+```{r message=FALSE}
+# Count the number of genes in each cluster
+
+load("/project2/xinhe/xsun/neuron_stimulation/5.magma/results/q_values_matrix.rdata")
+
+DT::datatable(q_values_matrix,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Gene-set analysis p-values from MAGMA'),options = list(pageLength = 5) )
+
+qvals_long <- melt(q_values_matrix, varnames = c("Set", "Condition"), value.name = "qval")
+
+# Plot the heatmap with conditional coloring
+ggplot(qvals_long, aes(x = Condition, y = Set, fill = qval < 0.3)) +
+  geom_tile(color = "white") +
+  scale_fill_manual(values = c("TRUE" = "red", "FALSE" = "blue"), labels = c("q-values > 0.3", "q-values < 0.3")) +
+  labs(title = "Heatmap of q-values", x = "Traits", y = "Gene Sets", fill = "q-values from MAGMA geneset analysis") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+<!-- ```{r message=FALSE} -->
+<!-- # Count the number of genes in each cluster -->
+
+<!-- load("/project2/xinhe/xsun/neuron_stimulation/5.magma/results/fdr_matrix.rdata") -->
+
+<!-- DT::datatable(fdr_matrix,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','Gene-set analysis p-values from MAGMA'),options = list(pageLength = 5) ) -->
+
+<!-- # Plot the heatmap with conditional coloring -->
+<!-- FDRs_long <- melt(fdr_matrix, varnames = c("Set", "Condition"), value.name = "FDR") -->
+
+<!-- # Plot the heatmap with conditional coloring -->
+<!-- ggplot(FDRs_long, aes(x = Condition, y = Set, fill = FDR < 0.3)) + -->
+<!--   geom_tile(color = "white") + -->
+<!--   scale_fill_manual(values = c("TRUE" = "red", "FALSE" = "blue"), labels = c("FDR > 0.3", "FDR < 0.3")) + -->
+<!--   labs(title = "Heatmap of FDR", x = "Traits", y = "Gene Sets", fill = "FDR from MAGMA geneset analysis") + -->
+<!--   theme_minimal() + -->
+<!--   theme(axis.text.x = element_text(angle = 45, hjust = 1)) -->
+
+<!-- ``` -->
 
